@@ -1,63 +1,47 @@
-# SYNC-SHIELD v6 — Methodology, Assumptions & Limitations
+# SYNC-SHIELD v8 — model methods and boundaries
 
-## Two-view architecture
+## Source-derived demand
 
-- `index.html` is the **judge-facing overview** matching the simplified PPT narrative. It uses the same historical workbook data and base-case arithmetic as the Engineering Lab but intentionally reduces the technical display.
-- `engineering-lab.html` is the **advanced decision model**; it contains the full adjustable hardware, radio, transport and failure assumptions. Both files work offline.
-- All maps are schematic and cannot predict actual RF field strength, interference or per-zone loading.
+Airtel case: 100,000 fans, 40% Airtel users, 18% simultaneous activity, 70% 5G-capable phones, 5 Mbps NR and 3 Mbps LTE.
 
-## Evidence from the case
+- Active Airtel users = 100,000 × 0.40 × 0.18 = 7,200.
+- NR demand = 7,200 × 0.70 × 5 = 25,200 Mbps.
+- LTE demand = 7,200 × 0.30 × 3 = 6,480 Mbps.
 
-- Case: 100,000 spectators; 40% Airtel market share; 70% 5G-capable; 18% peak concurrent; 5 Mbps 5G, 3 Mbps 4G; 100 MHz n78, 70 MHz LTE across 3 bands; limit of 80% loading; total budget ₹400 lakh; cost ₹8L/small cell, ₹25L/COW/event, ₹50L/km new fibre.
-- Network history: 32 site-phase KPI observations. At the previous match's innings break, average LTE B3 load of the seven busy sites ~98.5% while M6 was ~60.5%. Four actual n78 macro sites M1/M2/M3/M5 had ~36.2% reported 5G connection success. UPI failure 7.11% vs 1.23% normal day.
-- M4/M6 2 Gbps microwave; M1/M2/M3/M5 10 Gbps fibre. LTE-only rows carry a populated 5G-success field: treat its meaning as **unclear**, not evidence of NR present at those sites.
+## PRB-based model
 
-## Calculations
+Capacity per equivalent cell (Mbps) = PRBs × 12 × SCS_MHz × effective spectral efficiency (bits/s/Hz) × 0.80.
 
-Peak subscribers `100000 × .40 = 40000`, active `40000 × .18 = 7200`, NR-capable `7200 × .70 = 5040`, LTE-only `2160`. Peak demands: `5040 × 5 = 25200 Mbps NR` and `2160 × 3 = 6480 Mbps LTE`.
+- NR (100 MHz, 30 kHz spacing): 273 PRBs (3GPP TS 38.104); `273 × 12 × .03 × 6 × .8 = 471.744 Mbps`.
+- LTE: 350 **hypothetically pooled** PRBs across the case's three LTE bands. `350 × 12 × .015 × 3 × .8 = 151.2 Mbps`. All 350 PRBs per real LTE cell are NOT established by the workbook.
+- Required = 54 NR and 43 LTE equivalent sectors.
+- Existing 8 NR and 14 LTE equivalent sectors are based on unlabeled `5G 8 / 4G 14` entries in workbook S3:T4. This is a working interpretation, not an independently confirmed installed-cell inventory.
+- Planned NR = 8 existing + 34 new small cells + (2 COW × 3 NR sectors) + (2 macro upgrades × 3 new NR sectors) = **54**.
+- Planned LTE = 14 existing + 23 new LTE-capable small cells + (2 COW × 3 LTE sectors) = **43**.
+- Base model PRB utilisation = 79.139% NR and 79.734% LTE, as *aggregate equivalent-cell estimates*, not measured per-site PRBs.
+- At NR efficiency η = 5 bps/Hz, the required NR count increases to 65; base 54 fails. The ₹13L reserve cannot fund 11 additional standard small cells. Do not claim robust acceptance under this condition.
 
-### 5G PRB calculation
+## Backhaul / transport model
 
-Assume 30 kHz n78 subcarrier spacing. A 100 MHz NR channel contains 273 PRBs under 3GPP TS 38.104. One PRB occupies `12 × 30 kHz = 360 kHz = 0.36 MHz`. With assumed effective spectral efficiency η_NR = 6 bits/s/Hz (including TDD fraction and other applicable overhead), 80%-loaded sector data capacity is `273 × 0.36 × 6 × .8 = 471.744 Mbps`. Required `ceil(25200/471.744)=54` equivalent NR sectors. Sensitivity: η_NR 5 → 65; η_NR 4 → 81.
+- The four existing n78 macros M1/M2/M3/M5 have **10 Gbps fibre each**. These are separate links, not a guaranteed pooled 40Gbps shared service. Candidate distribution of new small cells: NR `[9,9,8,8]` and LTE `[6,6,6,5]` across those four parents. At 80% PRB radio load, incremental user traffic would be about `[5.15,5.15,4.68,4.53]` Gbps respectively. Including illustrative existing macro radio load gives about `[6.40,6.40,5.93,5.78]` Gbps/site. Requires field-verification of spare bandwidth, routing, aggregation hardware, optics and permissions.
+- M4/M6 transport: each existing **2Gbps microwave**. Three new NR and two existing LTE equivalent sectors at modelled 80% PRB loading would contribute **1.717632 Gbps/site** user traffic (about 86% of nominal microwave line rate). Airtel specifies 80% PRB radio loading, not 80% transport loading. Transport may be sufficient by nominal rate but needs overhead/headroom checks. No uncosted transport upgrade is claimed.
+- Each assumed 3NR+3LTE COW would need around **1.869Gbps** transport under the model; ≥2.5Gbps of suitable vendor supplied capacity is a provisional target. Confirm at procurement, including any fibre, microwave or cellular relay cost.
+- 0.5km fibre route at ₹50 lakh/km is a **provisional allowance** not a surveyed route. Only an actual topology and quote can validate ₹25 lakh.
 
-### LTE PRB calculation
+## Budget
 
-LTE uses 15 kHz SCS: one PRB = `12×15 kHz = 180 kHz = 0.18 MHz`. The 70 MHz LTE **case total** is spread across 3 bands; the illustrative optimistic model assumes that the equivalent cell can utilise 350 composite downlink PRBs (e.g., suitable multi-carrier configuration; LTE 20 MHz 100 PRBs, LTE 10 MHz 50 PRBs). Actual carriers, frequency availability by site, duplexing and device capability are missing. With assumed effective η_LTE =3 bits/s/Hz, capacity at 80% is `350×0.18×3×.8 =151.2 Mbps`. Required `ceil(6480/151.2)=43` LTE equivalents. At only 40 MHz/200 PRB, the required LTE cell count increases sharply.
+- 34 small cells × ₹8 lakh = ₹272 lakh (dual-RAT capability at this price unverified).
+- 2 COW × ₹25 lakh = ₹50 lakh (3NR+3LTE sectors/backhaul unverified).
+- 2 conditional macro upgrades × ₹20 lakh = ₹40 lakh **assumed vendor price**, not in case.
+- 0.5 km fibre × ₹50 lakh/km = ₹25 lakh **assumed route length**.
+- Total ₹387 lakh; ₹13 lakh uncommitted **includes all testing and contingency**.
 
-### Conditional baseline / deployment
+## 5G access, QoS and user experience
 
-Assume three sectors per macro site: 4 n78 macro =12 existing NR equivalents; 6 LTE macro =18 plus 2 existing LTE-only small cells =20 LTE. Thus needs additional **42 NR / 23 LTE**. Build 36 one-sector n78 small cells, at least 17 also LTE capable, plus two assumed 3-NR +3-LTE COWs. Total **54 NR / 43 LTE equivalents**.
+- NSA NR secondary-node addition is not the same as a conventional LTE→NR inter-RAT handover. Inspect LTE RRC setup SR, EN-DC / SgNB addition SR, B1 measurement and TTT, NR RACH, PS drop, actual IRAT handover SR if applicable, eNodeB A3/A5/CIO, supported band combinations and X2 configuration.
+- Prioritise LTE load relief (compatible LTE bands, M6 if RF/transport permits) before aggressive eNodeB measurement tuning that could add signalling load.
+- Managed merchant/POS QoS where supported; suitable wired/Wi-Fi fallback and UPI Lite where eligible. No universal dedicated network slice or always-available offline payment is assumed.
+- Emergency: operator-supported IMS emergency bearer priority and ARP pre-emption where implemented; do not block emergency services through access controls or claim fixed PRB reservation without a cost.
+- Negative effects: dense-cell interference, handover ping-pong, UL/backhaul congestion, indoor/outdoor boundary holes, post-match exit surges. Mitigations: PCI/TDD sync, planned tilt and power, handover pilots with rollback, transport checks and phase-based testing.
 
-Aggregate model NR PRB occupancy `25200 / (54×273×0.36×6) = 79.138968%`; LTE `6480/(43×350×0.18×3)=79.734219%`. Capacity at 80% = 25.474 Gbps NR and 6.502 Gbps LTE, only +0.274 Gbps and +0.022 Gbps above demand. These are pooled arithmetic values; **no actual cell's scheduled PRB counter is available** and spatial hotspots could exceed 80% even if pooled totals pass.
-
-Alternative undocumented Excel entries `5G = 8`, `4G = 14` are not labelled as existing radio sectors. If they were existing equivalents, preferred design would fail; the twin includes this alternative baseline as a stress test.
-
-### Budget and field conditions
-
-- Small cells: 36×₹8L = ₹288L
-- Two COWs: 2×₹25L = ₹50L
-- New fibre: assumed 0.5 km×₹50L/km = ₹25L
-- Testing/contingency: assumed ₹20L
-- Total ₹383L; remaining ₹17L
-
-Risks: case ₹8L small-cell unit cost does not explicitly promise dual-RAT; case ₹25L COW does not promise 3+3 sectors or backhaul; .5 km fibre not surveyed; 60-day permits/power/transport/OEM readiness not verified. Do not infer geographic RF reach from the illustrative map. No new small-cell or COW site backhaul cap is verifiable from the provided information.
-
-## KPIs and corrective control logic
-
-- **RRC SR** = successful RRC establishment ÷ RRC attempts ×100, for LTE accessibility.
-- **PS Drop** = operator-defined abnormal packet-service release / drop ratio; inspect E-RAB/DRB and EN-DC SCG failure counters to interpret retainability. Definition varies by vendor and service.
-- **SgNB addition SR** = successful secondary gNB additions ÷ requests ×100; primary NSA 5G addition KPI. The sheet's headline 5G success figure may have another definition — request metadata.
-- **IRAT HOSR** = actual inter-RAT handover successes ÷ attempts ×100; apply if a 4G→NR handover procedure exists (not interchangeable with NSA SgNB addition).
-- **DL/UL PRB occupancy** = scheduled resource blocks over sampled intervals ÷ available resource blocks over same intervals ×100, measured separately per cell and configured carrier. Require less than 80% under defined high-load tests.
-
-Candidate eNodeB changes to test **after diagnosis**: B1-NR measurement threshold, hysteresis and time-to-trigger; LTE A3/A5 offsets and CIO; compatible LTE anchor combinations, neighbour/X2 definitions and SgNB admission; LTE load steering and NR RACH/SCG error diagnostics. No fixed setting values are justified without site counter trends, drive tests and a rollback plan.
-
-## Functional zones and testing
-
-Bowl and stands: dense users at innings break. Food stalls: RRC, data access, low packet loss, merchant wired/managed Wi-Fi support. Gates/parking/exits: transient crowds, weak edge RF and handover routes. The spatial map illustrates priorities only. Validate UPI network-caused errors separately from bank/payment-app failures. Check IMS emergency calls and supported fallback. Stress the actual system against lower η, 90% NR served fraction, fewer COW sectors, less LTE PRB allocation, single macro outage, and 25% concurrency. Avoid claiming site-outage resilience from an aggregate spreadsheet model.
-
-## Standards
-
-- NR 273-PRB config: 3GPP TS38.104 Table 5.3.2-1 (100MHz, 30kHz).
-- LTE PRBs: 20MHz=100, 10MHz=50 under LTE waveform configurations; 12 subcarriers at 15kHz per PRB.
-- LTE RRC and NR Event B1: TS36.331. EN-DC SgNB addition: TS37.340.
+Targets: individual LTE/NR cell DL and UL PRB below 80%; NR addition success ≥95% (proposed), user 5/3Mbps targets under defined load, mobile-network-related POS transaction failures ≤2% (proposed; bank/network-wide failures not fully operator-controlled).
