@@ -1,62 +1,66 @@
-# SYNC-SHIELD — Stadium Network Decision Twin
+# SYNC-SHIELD — Airtel SYNC Stadium Surge Digital Twin (v6)
 
-An interactive, **offline / GitHub Pages-ready** decision-support demo aligned to the reviewed 7-slide **Airtel SYNC 2026 · Network Case 1: Stadium Surge** submission.
+**A judge-friendly, interactive capacity and investment model aligned with the simplified seven-slide Airtel SYNC presentation.**
 
-**[Open the simulator](index.html)** · No backend, API key, database, package installation, or build step. The entire application lives in `index.html`.
+The public home page explains the recommendation in six steps. The linked **Engineering Lab** retains the original detailed network model so the assumptions can be questioned.
 
-![Illustrative stadium radio deployment view](preview-rf.png)
+## Open the site
 
-## Matches the reviewed final PowerPoint
+Open **[`index.html`](index.html)** in any current desktop or mobile browser, or publish these files to GitHub Pages. No libraries, server, build tools, tokens, login, data collection or internet access are needed to run the HTML.
 
-The default **Hybrid A** scenario reproduces the deck's conditional infrastructure proposal:
+- **`index.html`** — recommended judge-facing view: the problem, solution, RF *illustration*, PRB math, budget, stress tests and 60-day plan.
+- **`engineering-lab.html`** — optional advanced interactive controls for radio efficiency, LTE bandwidth, sector baseline, COW capabilities, user demand, equipment quantities, outage stress and EN-DC diagnosis.
+- **`MODEL_NOTES.md`** — methods, original-data boundaries, KPI definitions and assumptions.
+- **`README.md`** — these instructions.
+- `preview-judge-desktop.png`, `preview-judge-mobile.png`, `preview-rf-after.png` — optional screenshot examples; not required by the website.
 
-| Item | Default | Provenance |
+## Default answer — matches the judge-ready slides
+
+| Item | Model value | Status |
 |---|---:|---|
-| Spectators | 100,000 | Airtel case |
-| Airtel share | 40% | Airtel case |
-| Peak active share | 18% | Airtel case |
-| 5G-capable share | 70% | Airtel case |
-| Target service | 5 Mbps NR, 3 Mbps LTE | Airtel case |
-| Maximum planned radio load | 80% | Airtel task |
-| Full-demand NR / LTE throughput | 25.20 / 6.48 Gbps | Calculated from case |
-| Existing radio equivalents | 12 NR / 20 LTE | **Unverified:** inferred 3-sector macro model |
-| New small cells | **35**, of which **13 LTE+NR** | Proposed; equipment capability and price unverified |
-| Temporary COWs | **2**, assumed 3 NR + 3 LTE sectors each | Proposed; sector capabilities unverified |
-| Macro upgrades | 0 | Preferred plan |
-| New fibre | 0.5 km | **Illustrative route allowance**, not surveyed |
-| Tests/contingency | ₹20 lakh | Assumed allowance |
-| Total cost | **₹375 lakh = ₹3.75 crore** | ₹280L cells + ₹50L COWs + ₹25L fibre + ₹20L tests |
-| Remaining budget | **₹25 lakh** | Calculated |
+| Audience | 100,000 | Airtel case |
+| Airtel subscribers | 40,000, with 7,200 concurrently active | Case percentages applied |
+| NR demand | 25.20 Gbps | Derived from 5,040 × 5 Mbps |
+| LTE demand | 6.48 Gbps | Derived from 2,160 × 3 Mbps |
+| NR equivalent-sector requirement | 54 | **Assumed** 273 PRBs / cell and effective ηNR=6 b/s/Hz |
+| LTE equivalent-sector requirement | 43 | **Assumed** 350 pooled PRBs / cell and ηLTE=3 b/s/Hz |
+| Existing baseline | 12 NR / 20 LTE equivalent sectors | **Unverified**, macro-sector assumption |
+| New infrastructure | **36 small cells, of which at least 17 dual-RAT**, plus **2 COWs** | Proposed; COW has assumed 3 NR and 3 LTE equivalents |
+| New fibre route | **0.5 km** | Budget allowance, not a surveyed route |
+| Testing / contingency | ₹20 lakh | Budget allowance |
+| Budget | **₹383 lakh / ₹400 lakh** | Calculated using case unit prices and assumptions |
+| Aggregate estimated PRB utilisation | **79.14% NR, 79.73% LTE** | Conditional arithmetic; actual per-cell and per-carrier measurements absent |
+| Delivery window | 60 days | Airtel case; achievable only if supply, access and permitting work |
 
-Assumed effective spectral efficiencies of 6 b/s/Hz NR and 3 b/s/Hz LTE imply 0.480 / 0.168 Gbps per equivalent cell **at 80% planned loading**. On the assumed 53 NR / 39 LTE cell configuration, planned capacity is **25.440 Gbps NR / 6.552 Gbps LTE**, leaving only **+0.240 / +0.072 Gbps**. These margins are extremely narrow; do **not** describe this as guaranteed capacity or a validated deployable design.
+This design has **very narrow capacity headroom** (0.274 Gbps NR and 0.022 Gbps LTE at the 80% model limit). It is not a guaranteed network design.
 
-## Demo in 90 seconds
+### What to demonstrate to the judges
 
-1. **Previous match · measured:** Show seven sites near 99% LTE load at innings break versus M6 at 60.5%, and n78 connection success averaging 36.2%.
-2. **Final · simulated:** Default is the reviewed-deck Hybrid A proposal. Read the NR, LTE and budget panels: exactly ₹3.75 Cr and the very small margins above.
-3. **RF Coverage → Before/After:** Show representative seating-bowl, food/payment, entry/exit and parking deployment priorities; these are **illustrative**, not measured RSRP or SINR predictions.
-4. **Compare competing architectures:** Examine fibre-only (41 small, 0 COW), Hybrid A (35+2) and Hybrid B (32+3). The 13, 19 and 10 dual-RAT counts are explicitly included in each model.
-5. **Failure laboratory:** Test the unconfirmed worksheet `8 NR / 14 LTE` interpretation, 1-sector COW, 40 MHz usable LTE, NR spectral efficiency 5 b/s/Hz, 10% 5G fallback, or a macro failure. The arithmetic model should fail in most of these stress cases.
-6. **EN-DC failure detective:** Select LTE, measurement, admission, or NR random-access bottlenecks to illustrate different *hypothetical* explanations of the same measured success KPI.
-7. **Export scenario:** Download a JSON snapshot of exactly which assumptions were used, for auditability.
+1. Start at the top: **What failed?** Peak LTE congestion, poor 5G connection success, low NR speed and UPI failures from the previous match.
+2. Explain the three countermeasures: **Connect → Stay connected → Protect users**. Use RRC SR, EN-DC addition SR, PS Drop / SCG failure, mobility KPIs and PRB counters to verify outcomes.
+3. Toggle **Existing / Proposed** on the schematic. Stress that it is **illustrative**, not a calibrated propagation model or real site map.
+4. Show the **54 NR / 43 LTE equivalent cell** derivation and **₹3.83 crore** budget.
+5. Click **NR η drops to 5**, **Only 40 MHz LTE**, or **COW has 1 sector**. The arithmetic fails; this demonstrates why field acceptance gates matter.
+6. Open the **Engineering Lab** only if someone asks for full counterfactuals or detailed assumptions.
 
-## GitHub Pages publication
+## Upload the files to your existing GitHub repository
 
-1. Create a **public GitHub repository** (for example `sync-shield`).
-2. Upload the **contents of this folder** into the repository root. In particular, `index.html` must be in the repository root — **not nested in an extra folder**.
-3. Commit the files to your default branch (usually `main`).
-4. Open **Settings → Pages**, select **Deploy from a branch**, choose `main` and `/(root)`, then save.
-5. GitHub will provide a page URL typically shaped like `https://YOUR-USERNAME.github.io/sync-shield/` (actual URL depends on your repo). Test it in a private/incognito tab and on a phone.
-6. Put that **public URL and a QR code** on slide 7 and verify that the PPT and PDF links work. Do not put a local file or ChatGPT sandbox URL into the competition slides.
+1. Extract the ZIP to a folder on your computer. **Do not upload the ZIP itself.**
+2. Open the `SYNC-SHIELD` repository and choose **Add file → Upload files**.
+3. Upload **`index.html`, `engineering-lab.html`, `README.md`, and `MODEL_NOTES.md`** to the **repository root**; optionally upload the preview PNG files. Replace the older versions of `index.html`, `README.md`, and `MODEL_NOTES.md` and click **Commit changes**.
+4. Under **Settings → Pages**, keep **Deploy from a branch → main → /(root)**. This is a static site; no custom domain is required.
+5. Use the existing **Visit site** link in Pages. Refresh the site (hard reload if cached). Verify the opening display shows **36 small cells / 2 COWs / ₹3.83 Cr**, the Before/After map changes and the **Engineering Lab** opens.
+6. Verify the existing link / QR in Slide 7 still directs to the same `...github.io/SYNC-SHIELD/` repository website. **The repository name and live URL do not change** when you replace the HTML file.
 
-**No secret, token, SIM, network authentication or live Airtel access is needed.** No data leaves the browser except a user-triggered local JSON download. The app is static HTML, CSS and vanilla JavaScript. All source case observations are bundled into the HTML.
+If GitHub creates a nested folder such as `SYNC_SHIELD_GitHub_Upload_v6/index.html` rather than `index.html` at the root, the website will not update correctly. Upload the **contents** of the extracted folder.
 
-## Evidence and limitations
+## Important limitations
 
-The case supplies eight site descriptions, 32 site-phase measurements, four UPI failure readings, nominal spectrum and unit prices. It does **not** supply stadium coordinates, antenna directions, RF interference maps, actual LTE band availability per cell, COW radio configurations, dual-RAT small-cell pricing, fibre routes, permission status, or the real crowd distribution across stadium zones.
+- The Excel workbook provides 32 phase/site observations and an eight-site inventory, **not** true per-cell PRB measurements, stadium coordinates, antenna configurations or full fibre routes.
+- Four n78 macro sites are identifiable. Some LTE-only rows also have a 5G-success field; its meaning is uncertain and the twin does **not** treat that as local NR coverage.
+- The workbook's unexplained `5G = 8`, `4G = 14` cells are **not confirmed installed-sector counts**. The Engineering Lab lets you explore that interpretation.
+- NR 273 PRBs is specific to 100 MHz, 30 kHz SCS. LTE's 350 composite PRBs per equivalent cell and all effective spectral efficiencies are **hypotheses**, not measured availability.
+- The COW configuration, number of LTE+NR sectors, dual-RAT small-cell price, transport / power and installation costs require quotations and site survey.
+- The RF diagram is only a scenario illustration, and **no actual mobility performance, UPI outcome, RRC SR, PS Drop or per-cell PRB outcome is predicted**.
 
-The workbook contains unlabeled `5G = 8` and `4G = 14` cells in addition to site records. These might relate to sector inventory but are **not sufficiently defined**. Use the baseline selector to show how the answer changes; the model does not assert they are definitely installed radio cells.
-
-`PASS*` or `CONDITIONAL ARITHMETIC PASS` only means the scenario passes a **simplified aggregate throughput/budget calculation**. It does not establish real RF coverage, transport feasibility, payment success, emergency-call continuity, or procurement within 60 days. Existing microwave constraints are approximated only for optional macro upgrades. New small-cell and COW transport is not certified by the model.
-
-See [MODEL_NOTES.md](MODEL_NOTES.md) for formulas and exact assumptions. The 60-day execution stages are in the slide deck; the app makes no claim of actual on-site deployment.
+See **[MODEL_NOTES.md](MODEL_NOTES.md)** for equations, exact assumptions, diagnostics and acceptance criteria.
